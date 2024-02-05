@@ -1,31 +1,72 @@
 import numpy as np
 import pandas as pd
 
+# take care of missing numerical data
+
+def numeric_missing_data(dataset: pd.DataFrame):
+
+    numeric_columns = dataset.select_dtypes(include="number")
+    numeric_column_names = list(numeric_columns.columns)
+    column_means = [dataset[column].mean() for column in numeric_column_names]
+    numeric_to_replace = {column_name:mean_column for (column_name, mean_column) in zip(numeric_column_names, column_means) if column_name != 'Id'}
+
+    dataset.fillna(numeric_to_replace, inplace=True)
+
+    return dataset
+
+
+# take care of mising non-numeric data
+
+def non_num_missing_data(dataset: pd.DataFrame, minimum_entries: int = 100):
+
+    non_num_columns = dataset.select_dtypes(exclude="number")
+    non_num_column_names = list(non_num_columns.columns)
+    column_average = [dataset[column].mode().iloc[0] for column in non_num_column_names]
+    non_num_to_replace = {column_name:mean_column for (column_name, mean_column) in zip(non_num_column_names, column_average) if dataset[column_name].isna().sum() < minimum_entries}
+
+    dataset.fillna(non_num_to_replace, inplace=True)
+
+    return dataset
+
+
+#import the datasets
+
 dataset = pd.read_csv("train.csv")
-x_train = dataset.iloc[0:, 1:-1].values    
-y_train = dataset.iloc[0:, -1].values
-
-dataset = pd.read_csv("test.csv")
-x_test = dataset.iloc[0:, 1:-1].values    
-y_test = dataset.iloc[0:, -1].values
-
+test_dataset = pd.read_csv("test.csv")
 
 # take care of missing data
 
-from sklearn.impute import SimpleImputer
+dataset = numeric_missing_data(dataset)
+dataset = non_num_missing_data(dataset, 200)
+test_dataset = numeric_missing_data(test_dataset)
+test_dataset = non_num_missing_data(test_dataset, 200)
 
-data_replacer = SimpleImputer(missing_values=np.nan, strategy='mean')
-data_replacer.fit(x_train[:, :])
-x_train[:, :] = data_replacer.transform(x_train[:, :])
-x_test[:, :] = data_replacer.fit_transform(x_test[:, :])
+# create input
 
+x_train = dataset.iloc[0:, 1:-1].values    
+y_train = dataset.iloc[0:, -1].values
 
-# encoding categorical
+x_test = test_dataset.iloc[0:, 1:].values    
+
+# get columns with Non-numeric values:
+
+non_numeric_columns = dataset.select_dtypes(exclude='number')
+
+non_numeric_column_indices = [dataset.columns.get_loc(col)-1 for col in non_numeric_columns]
+
+# encoding categorical data
 
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
+ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), non_numeric_column_indices)], remainder='passthrough', sparse_threshold=0)
+x_train = ct.fit_transform(x_train)
+x_test = ct.transform(x_test)
 
-ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 34, 38, 39, 40, 41, 52, 54, 56, 57, 59, 62, 63, 64, 71, 72, 73, 77, 78])], remainder='passthrough')
-x_train = np.array(ct.fit_transform(x_train))
-x_test = np.array(ct.fit_transform(x_test))
+# training the model
+
+from sklearn.ensemble import RandomForestRegressor
+regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
+regressor.fit(x_train, y_train)
+
+print(regressor.predict(x_test))

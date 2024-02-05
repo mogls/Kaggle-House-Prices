@@ -69,4 +69,12 @@ from sklearn.ensemble import RandomForestRegressor
 regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
 regressor.fit(x_train, y_train)
 
-print(regressor.predict(x_test))
+results = regressor.predict(x_test)
+
+indexes = list(range(1461, 1461+len(results)))
+
+to_csv = {"Id":indexes, "results":results}
+
+df_to_csv = pd.DataFrame(to_csv).set_index("Id")
+
+df_to_csv.to_csv("Random_Forest_Results.csv")

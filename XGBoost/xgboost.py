@@ -64,16 +64,15 @@ x_train = ct.fit_transform(x_train)
 x_test = ct.transform(x_test)
 
 # training the model
-
-from sklearn.ensemble import RandomForestRegressor
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
+from xgboost import XGBRegressor
+regressor = XGBRegressor()
 regressor.fit(x_train, y_train)
 
-# Predicting results
+# predicting results
 
 results = regressor.predict(x_test)
 
-# Exporting to csv
+# exporting to csv
 
 indexes = list(range(1461, 1461+len(results)))
 
@@ -81,4 +80,5 @@ to_csv = {"Id":indexes, "results":results}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 
-df_to_csv.to_csv("./Random-Forest/Random_Forest_Results.csv")
+df_to_csv.to_csv("./XGBoost/XGBoost_Results.csv")
+

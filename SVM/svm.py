@@ -63,22 +63,34 @@ ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), non_numeric_co
 x_train = ct.fit_transform(x_train)
 x_test = ct.transform(x_test)
 
+# scailing
+
+from sklearn.preprocessing import StandardScaler
+
+sc_x = StandardScaler()
+X = sc_x.fit_transform(x_train)
+x_test = sc_x.transform(x_test)
+
+sc_y = StandardScaler()
+y = sc_y.fit_transform(y_train.reshape(-1, 1))
+
+
 # training the model
+from sklearn.svm import SVR
 
-from sklearn.ensemble import RandomForestRegressor
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
-regressor.fit(x_train, y_train)
+regressor = SVR(kernel='rbf')
+regressor.fit(X, y)
 
-# Predicting results
+# predicting results
 
-results = regressor.predict(x_test)
+results = sc_y.inverse_transform(regressor.predict(x_test).reshape(-1, 1))
 
-# Exporting to csv
+# exporting to csv
 
 indexes = list(range(1461, 1461+len(results)))
 
-to_csv = {"Id":indexes, "results":results}
+to_csv = {"Id":indexes, "results":[result[0] for result in results]}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 
-df_to_csv.to_csv("./Random-Forest/Random_Forest_Results.csv")
+df_to_csv.to_csv("./SVM/SVM_Results.csv")

@@ -64,16 +64,21 @@ x_train = ct.fit_transform(x_train)
 x_test = ct.transform(x_test)
 
 # training the model
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
-from sklearn.ensemble import RandomForestRegressor
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
-regressor.fit(x_train, y_train)
+poly_input  = PolynomialFeatures(degree=2)
 
-# Predicting results
+X_poly = poly_input.fit_transform(x_train)
 
-results = regressor.predict(x_test)
+poly_model = LinearRegression()
+poly_model.fit(X_poly, y_train)
 
-# Exporting to csv
+# predicting results
+
+results = poly_model.predict(poly_input.transform(x_test))
+
+# exporting to csv
 
 indexes = list(range(1461, 1461+len(results)))
 
@@ -81,4 +86,4 @@ to_csv = {"Id":indexes, "results":results}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 
-df_to_csv.to_csv("./Random-Forest/Random_Forest_Results.csv")
+df_to_csv.to_csv("./Polynomial_Regression(Fail)/Polynomial_Regression_Results.csv")

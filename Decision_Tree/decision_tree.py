@@ -65,8 +65,8 @@ x_test = ct.transform(x_test)
 
 # training the model
 
-from sklearn.ensemble import RandomForestRegressor
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
+from sklearn.tree import DecisionTreeRegressor
+regressor = DecisionTreeRegressor(random_state=0)
 regressor.fit(x_train, y_train)
 
 # Predicting results
@@ -81,4 +81,4 @@ to_csv = {"Id":indexes, "results":results}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 
-df_to_csv.to_csv("./Random-Forest/Random_Forest_Results.csv")
+df_to_csv.to_csv("./Decision_Tree/Decision_Tree_Results.csv")

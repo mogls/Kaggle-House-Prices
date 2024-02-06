@@ -65,15 +65,25 @@ x_test = ct.transform(x_test)
 
 # training the model
 
-from sklearn.ensemble import RandomForestRegressor
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
-regressor.fit(x_train, y_train)
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+
+# Training the K-NN model on the Training set
+from sklearn.neighbors import KNeighborsClassifier
+
+classifier = KNeighborsClassifier(n_neighbors=5, metric='minkowski', p=2)
+
+classifier.fit(x_train, y_train)
 
 # Predicting results
 
-results = regressor.predict(x_test)
+results = classifier.predict(x_test)
 
-# Exporting to csv
+# exporting results to csv
 
 indexes = list(range(1461, 1461+len(results)))
 
@@ -81,4 +91,4 @@ to_csv = {"Id":indexes, "results":results}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 
-df_to_csv.to_csv("./Random-Forest/Random_Forest_Results.csv")
+df_to_csv.to_csv("./KNN/KNN_Results_Scaled_5.csv")

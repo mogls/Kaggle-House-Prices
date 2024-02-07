@@ -77,7 +77,7 @@ results = regressor.predict(x_test)
 
 indexes = list(range(1461, 1461+len(results)))
 
-to_csv = {"Id":indexes, "results":results}
+to_csv = {"Id":indexes, "SalePrice":results}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 

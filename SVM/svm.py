@@ -89,7 +89,7 @@ results = sc_y.inverse_transform(regressor.predict(x_test).reshape(-1, 1))
 
 indexes = list(range(1461, 1461+len(results)))
 
-to_csv = {"Id":indexes, "results":[result[0] for result in results]}
+to_csv = {"Id":indexes, "SalePrice":[result[0] for result in results]}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 

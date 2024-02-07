@@ -66,7 +66,7 @@ x_test = ct.transform(x_test)
 # training the model
 
 from sklearn.ensemble import RandomForestRegressor
-regressor = RandomForestRegressor(n_estimators = 100, random_state = 0)
+regressor = RandomForestRegressor(n_estimators = 150, random_state = 0)
 regressor.fit(x_train, y_train)
 
 # Predicting results
@@ -81,4 +81,4 @@ to_csv = {"Id":indexes, "SalePrice":results}
 
 df_to_csv = pd.DataFrame(to_csv).set_index("Id")
 
-df_to_csv.to_csv("./Random-Forest/Random_Forest_Results.csv")
+df_to_csv.to_csv("./Random-Forest/Random_Forest_Results_2.csv")
